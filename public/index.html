@@ -22,6 +22,29 @@ h1{font-size:22px;font-weight:600;color:#fff;text-align:center;margin-bottom:10p
 input{background:#252525;border:1px solid #444;color:#fff;padding:10px;border-radius:8px;width:100%}
 .loading-pulse{animation:pulse 1.5s infinite;color:#777}
 @keyframes pulse{0%{opacity:0.5}50%{opacity:1}100%{opacity:0.5}}
+
+.dossier-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.dossier-card{background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:12px;cursor:pointer;transition:border-color 0.2s,background 0.2s}
+.dossier-card:hover{border-color:#fbbf24;background:#222}
+.dossier-card .card-name{font-weight:bold;font-size:13px;color:#fff;margin-bottom:2px}
+.dossier-card .card-species{font-size:11px;color:#888;margin-bottom:6px}
+.dossier-card .card-hint{font-size:11px;color:#aaa;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dossier-detail{display:none;flex-direction:column;gap:0}
+.dossier-detail.active{display:flex}
+.dossier-back{background:transparent;border:none;color:#fbbf24;cursor:pointer;font-size:13px;padding:0 0 12px 0;text-align:left;display:flex;align-items:center;gap:6px}
+.dossier-portrait{width:72px;height:72px;border-radius:8px;background:#252525;border:2px solid #444;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+.dossier-header{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.dossier-name{font-size:17px;font-weight:bold;color:#fbbf24;margin-bottom:2px}
+.dossier-subtitle{font-size:12px;color:#888}
+.dossier-field{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #2a2a2a;align-items:flex-start}
+.dossier-field:last-child{border-bottom:none}
+.dossier-field-icon{font-size:15px;flex-shrink:0;width:20px;text-align:center;margin-top:1px}
+.dossier-field-body{}
+.dossier-field-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#666;margin-bottom:1px}
+.dossier-field-value{font-size:13px;color:#ddd;line-height:1.4}
+.warrant-btn{margin-top:14px;width:100%;background:#fbbf24;color:#000;border:none;border-radius:8px;padding:10px;font-weight:bold;font-size:14px;cursor:pointer}
+.warrant-btn:hover{background:#f59e0b}
+.warrant-issued{margin-top:14px;width:100%;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:bold;font-size:14px;cursor:default;opacity:0.85}
 </style>
 </head>
 <body>
@@ -105,11 +128,23 @@ input{background:#252525;border:1px solid #444;color:#fff;padding:10px;border-ra
   <button class="btn primary" style="width:100%" onclick="location.reload()">Nova Partida</button>
 </div>
 
-<div id="warrant-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;align-items:center;justify-content:center">
-  <div style="background:#1e1e1e;padding:20px;border-radius:16px;width:90%;max-width:400px">
-    <h3>Emitir Mandado</h3>
-    <div id="warrant-options" style="margin:15px 0;max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
-    <button class="btn" style="width:100%" onclick="closeWarrantModal()">Fechar</button>
+<div id="warrant-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:100;align-items:flex-start;justify-content:center;overflow-y:auto;padding:16px">
+  <div style="background:#1e1e1e;border:1px solid #333;border-radius:16px;width:100%;max-width:480px;padding:20px;margin:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <div>
+        <h3 style="color:#fbbf24;font-size:16px;margin:0">📁 Dossiê dos Suspeitos</h3>
+        <p id="dossier-subtitle" style="font-size:11px;color:#666;margin-top:2px">Selecione um suspeito para ver a ficha completa</p>
+      </div>
+      <button onclick="closeWarrantModal()" style="background:transparent;border:none;color:#666;font-size:20px;cursor:pointer;line-height:1;padding:4px">✕</button>
+    </div>
+    <div id="dossier-grid-view">
+      <div class="dossier-grid" id="dossier-grid"></div>
+    </div>
+    <div id="dossier-detail-view" style="display:none">
+      <button class="dossier-back" onclick="showDossierGrid()">← Voltar à lista</button>
+      <div id="dossier-detail-content"></div>
+    </div>
+
   </div>
 </div>
 
@@ -186,6 +221,109 @@ const CRIMINALS_CATALOG = [
   {id:"prisioner_13",          name:"Prisioneira 13"},
   {id:"valindra_shadowmantle", name:"Valindra Shadowmantle"},
   {id:"xardorok_sunblight",    name:"Xardorok Sunblight"}
+];
+
+const DOSSIER = [
+  {
+    id: "black_spider",
+    name: "Aranha Negra",
+    portrait: "🕷️",
+    species: "Élfico",
+    hobby: "Xadrez",
+    transport: "Costuma se locomover por meios mágicos",
+    trait: "Carrega consigo um cajado cuja ponta tem a forma de uma aranha negra",
+    cuisine: "Tem preferência por comidas leves e práticas"
+  },
+  {
+    id: "glassstaff",
+    name: "Cajado de Vidro",
+    portrait: "🪄",
+    species: "Humano",
+    hobby: "Xadrez",
+    transport: "Costuma se locomover por meios mágicos",
+    trait: "Nunca aparece em público sem seu cajado de vidro",
+    cuisine: "Apesar de ter mais interesse em estudar do que em comer, não abre mão de uma salada variada"
+  },
+  {
+    id: "halia_thornton",
+    name: "Halia Thornton",
+    portrait: "💍",
+    species: "Humana",
+    hobby: "Cartas",
+    transport: "Carruagem de ébano e cortinas escuras",
+    trait: "É fã de anéis e colares com pedras preciosas",
+    cuisine: "Gosta de experimentar pimentas exóticas"
+  },
+  {
+    id: "jarlaxe_baenre",
+    name: "Jarlaxle Baenre",
+    portrait: "🎩",
+    species: "Élfico",
+    hobby: "Cartas",
+    transport: "Máquina infernal com duas rodas particularmente rápida",
+    trait: "Possui um anel de diamante do tamanho de uma toranja",
+    cuisine: "Fã de camarões e mariscos, desde pratos refinados até a comida vendida nos portos"
+  },
+  {
+    id: "lord_drylund",
+    name: "Lorde Drylund",
+    portrait: "🐙",
+    species: "Humano",
+    hobby: "Dados",
+    transport: "Carruagem excessivamente enfeitada",
+    trait: "Dizem que tem uma tatuagem de polvo nas costas",
+    cuisine: "Costuma pedir duas sobremesas, dizendo que uma delas é para seu polvo familiar"
+  },
+  {
+    id: "nass_lantomir",
+    name: "Nass Lantomir",
+    portrait: "🔥",
+    species: "Humana",
+    hobby: "Cartas",
+    transport: "Costuma se locomover por meios mágicos",
+    trait: "Anda com seu cajado que serve como foco arcano",
+    cuisine: "Seu humor sempre piora quando passa muitos dias sem comer camarões empanados"
+  },
+  {
+    id: "nine_fingers_keene",
+    name: "Nove-Dedos Keene",
+    portrait: "👑",
+    species: "Humana",
+    hobby: "Dados",
+    transport: "Carruagem guiada por capangas",
+    trait: "É sempre vista com colares de ouro e armas adornadas em joias",
+    cuisine: "Conhecida por frequentar todas as confeitarias de Waterdeep"
+  },
+  {
+    id: "prisioner_13",
+    name: "Prisioneira 13",
+    portrait: "⛓️",
+    species: "Anã",
+    hobby: "Dados",
+    transport: "Máquina infernal com duas rodas, bastante barulhenta",
+    trait: "Possui tatuagens por todo o corpo, muitas das quais são mágicas",
+    cuisine: "Gosta de resolver disputas apostando em quem come a comida mais picante e sempre vence"
+  },
+  {
+    id: "valindra_shadowmantle",
+    name: "Valindra Shadowmantle",
+    portrait: "💀",
+    species: "Élfica",
+    hobby: "Xadrez",
+    transport: "Costuma se locomover por meios mágicos",
+    trait: "Utiliza joias élficas delicadas ao aparecer em público",
+    cuisine: "Dizem que na juventude era vista comendo pratos refinados de frutos do mar"
+  },
+  {
+    id: "xardorok_sunblight",
+    name: "Xardorok Sunblight",
+    portrait: "⚒️",
+    species: "Anão",
+    hobby: "Dados",
+    transport: "Carruagem de aço puxada por constructos",
+    trait: "Dizem que possui tatuagens de runas anãs em seu braço esquerdo",
+    cuisine: "Gosta de comida picante, segundo ele, como todo anão deveria"
+  }
 ];
 
 let G = {
@@ -408,11 +546,7 @@ function switchTab(t, el) {
 }
 
 function openWarrantModal() {
-  document.getElementById('warrant-options').innerHTML = CRIMINALS_CATALOG.map(c =>
-    `<div class="city-option" style="padding:8px;background:#333;border-radius:4px;cursor:pointer" onclick="issueWarrant('${c.id}')">
-      👤 ${c.name}
-    </div>`
-  ).join('');
+  showDossierGrid();
   document.getElementById('warrant-modal').style.display = 'flex';
 }
 
@@ -420,12 +554,72 @@ function closeWarrantModal() {
   document.getElementById('warrant-modal').style.display = 'none';
 }
 
+function showDossierGrid() {
+  document.getElementById('dossier-grid-view').style.display = 'block';
+  document.getElementById('dossier-detail-view').style.display = 'none';
+  document.getElementById('dossier-subtitle').textContent = 'Selecione um suspeito para ver a ficha completa';
+
+  const grid = document.getElementById('dossier-grid');
+  grid.innerHTML = DOSSIER.map(d => {
+    const isActive = G.warrant === d.id;
+    return '<div class="dossier-card' + (isActive ? '" style="border-color:#fbbf24;background:#222' : '"') + '" onclick="showDossierDetail(\'' + d.id + '\')">'
+      + '<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">'
+      + '<span style="font-size:22px">' + d.portrait + '</span>'
+      + '<div><div class="card-name">' + d.name + (isActive ? ' ⚖️' : '') + '</div>'
+      + '<div class="card-species">' + d.species + '</div></div>'
+      + '</div>'
+      + '<div class="card-hint">' + d.trait + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function showDossierDetail(id) {
+  const d = DOSSIER.find(x => x.id === id);
+  if (!d) return;
+
+  document.getElementById('dossier-grid-view').style.display = 'none';
+  document.getElementById('dossier-detail-view').style.display = 'block';
+  document.getElementById('dossier-subtitle').textContent = 'Ficha de suspeito';
+
+  const isActive = G.warrant === d.id;
+  const warrantBtn = isActive
+    ? '<div class="warrant-issued">⚖️ Mandado emitido</div>'
+    : '<button class="warrant-btn" onclick="issueWarrantFromDossier(\'' + d.id + '\')">⚖️ Emitir mandado contra este suspeito</button>';
+
+  document.getElementById('dossier-detail-content').innerHTML =
+    '<div class="dossier-header">'
+    + '<div class="dossier-portrait">' + d.portrait + '</div>'
+    + '<div><div class="dossier-name">' + d.name + '</div>'
+    + '<div class="dossier-subtitle">' + d.species + '</div></div>'
+    + '</div>'
+    + '<div>'
+    + dossierField('🎲', 'Passatempo favorito', d.hobby)
+    + dossierField('⛵', 'Meio de transporte', d.transport)
+    + dossierField('✨', 'Traço marcante', d.trait)
+    + dossierField('🍽️', 'Preferências culinárias', d.cuisine)
+    + '</div>'
+    + warrantBtn;
+}
+
+function dossierField(icon, label, value) {
+  return '<div class="dossier-field">'
+    + '<div class="dossier-field-icon">' + icon + '</div>'
+    + '<div class="dossier-field-body">'
+    + '<div class="dossier-field-label">' + label + '</div>'
+    + '<div class="dossier-field-value">' + value + '</div>'
+    + '</div></div>';
+}
+
+function issueWarrantFromDossier(id) {
+  issueWarrant(id);
+  showDossierDetail(id);
+}
+
 function issueWarrant(id) {
   G.warrant = id;
   const criminal = CRIMINALS_CATALOG.find(c => c.id === id);
   document.getElementById('warrant-display').innerHTML =
     `<span style="color:#fff;font-weight:normal">Mandado ativo:</span> <span style="color:#fbbf24">${criminal.name}</span>`;
-  closeWarrantModal();
 }
 
 async function foundCriminal() {
