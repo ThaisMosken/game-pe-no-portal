@@ -187,7 +187,7 @@
       "Defense": "os Cavaleiros que patrulham o cume e as trilhas de acesso",
       "Factions": "os membros da Aliança dos Lordes que garantem a segurança das rotas de comércio",
       "Geographical Aspects": "o vale do rio Chionthar",
-      "Geography": "a névoa densa que cobre a base do cume ao amanhecer, deixando apenas as torres visíveis",
+      "Geography": "a névoa densa que cobre parte do local ao amanhecer, deixando apenas as torres visíveis",
       "Government Type": "um conselho de mercadores presidido por um lorde eleito para mandatos curtos",
       "History": "a necessidade de expansão vertical devido à limitação de espaço físico no topo da rocha",
       "Infrastructure": "as torres de pedra que desafiam a gravidade com escadarias externas esculpidas num penhasco",
@@ -203,7 +203,7 @@
     "id": "longsaddle",
     "name": "Longsaddle",
     "curiosities": {
-      "Culture": "a comunidade conhecida pela presença de magos peculiares e muitas vezes excêntricos e fenômenos mágicos estranhos são considerados rotina",
+      "Culture": "a comunidade conhecida pela presença de magos peculiares e muitas vezes excêntricos onde fenômenos mágicos estranhos são considerados rotina",
       "Defense": "os feitiços complexos que protegem toda a vila e as milícia de cidadãos treinada por magos em táticas de suporte elemental",
       "Factions": "a aliança estratégica entre a família Harpell e a Aliança dos Lordes",
       "Geographical Aspects": "as planícies abertas e gramadas do Vale de Dessarin",
