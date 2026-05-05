@@ -98,11 +98,42 @@ def start_game(req: https_fn.Request) -> https_fn.Response:
 
     db = firestore.client()
     try:
-        all_city_ids = [d.to_dict()["id"] for d in db.collection("cities").select(["id"]).stream()]
+        body = req.get_json(silent=True) or {}
+        password_attempt = body.get("password", "")
 
+        # Lê config de acesso e contador de rate limit em uma única leitura
+        config_ref = db.collection("config").document("access")
+        config_doc = config_ref.get()
+        config = config_doc.to_dict() if config_doc.exists else {}
+
+        # Valida senha
+        expected_password = config.get("password", "")
+        if not expected_password or password_attempt != expected_password:
+            return https_fn.Response(
+                json.dumps({"error": "Senha incorreta."}),
+                status=401, mimetype="application/json", headers=cors_headers
+            )
+
+        max_per_hour = config.get("max_sessions_per_hour", 20)
+        from datetime import datetime, timezone, timedelta
+        one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
+        recent_docs = db.collection("sessions") \
+            .where("start_time", ">=", one_hour_ago) \
+            .select([]) \
+            .stream()
+        session_count = sum(1 for _ in recent_docs)
+
+        if session_count >= max_per_hour:
+            return https_fn.Response(
+                json.dumps({"error": "Limite de partidas por hora atingido. Tente novamente mais tarde."}),
+                status=429, mimetype="application/json", headers=cors_headers
+            )
+
+        all_city_ids = [d.to_dict()["id"] for d in db.collection("cities").select(["id"]).stream()]
         criminal_id = random.choice(CRIMINAL_IDS)
         trail_ids = random.sample(all_city_ids, 6)
         non_trail_ids = [c for c in all_city_ids if c not in trail_ids]
+
         venues_per_city = {}
         distractors_per_city = {}
         for city_id in trail_ids:
@@ -138,7 +169,9 @@ def start_game(req: https_fn.Request) -> https_fn.Response:
             headers=cors_headers
         )
     except Exception as e:
-        return https_fn.Response(json.dumps({"error": str(e)}), status=500, headers=cors_headers)
+        return https_fn.Response(
+            json.dumps({"error": str(e)}), status=500, headers=cors_headers
+        )
 
 
 @https_fn.on_request()
