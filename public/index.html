@@ -519,6 +519,10 @@ function renderVenues() {
   var cityId    = G.currentCityId;
   var container = document.getElementById('venues-list');
   var html = '';
+  if (G.venuesInCity.length === 0) {
+    container.innerHTML = '<div class="card" style="color:#888;font-size:13px;text-align:center;padding:24px">⚠️ Você está no caminho errado.<br>Não há testemunhas para interrogar aqui.</div>';
+    return;
+  }
   for (var i = 0; i < G.venuesInCity.length; i++) {
     var vid     = G.venuesInCity[i];
     var v       = VENUES_CATALOG[vid] || {name: vid, icon: '?'};

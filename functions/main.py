@@ -367,8 +367,10 @@ def travel(req: https_fn.Request) -> https_fn.Response:
 
         player_on_trail = (target_city_id == trail[current_step])
 
-        if target_city_id not in venues_per_city:
+        if player_on_trail and target_city_id not in venues_per_city:
             venues_per_city[target_city_id] = random.sample(VENUE_IDS, 3)
+        elif not player_on_trail:
+            venues_per_city[target_city_id] = []
 
         if player_on_trail and target_city_id not in distractors_per_city:
             all_city_ids = [d.to_dict()["id"] for d in db.collection("cities").select(["id"]).stream()]
