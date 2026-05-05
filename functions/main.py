@@ -100,8 +100,8 @@ def start_game(req: https_fn.Request) -> https_fn.Response:
     try:
         body = req.get_json(silent=True) or {}
         password_attempt = body.get("password", "")
+        player_name = body.get("playerName", "")
 
-        # Lê config de acesso e contador de rate limit em uma única leitura
         config_ref = db.collection("config").document("access")
         config_doc = config_ref.get()
         config = config_doc.to_dict() if config_doc.exists else {}
@@ -150,6 +150,7 @@ def start_game(req: https_fn.Request) -> https_fn.Response:
             "venues_per_city": venues_per_city,
             "distractors_per_city": distractors_per_city,
             "used_curiosities_per_city": {},
+            "player": player_name,
         })
 
         return https_fn.Response(
@@ -438,3 +439,37 @@ def arrest(req: https_fn.Request) -> https_fn.Response:
 
     except Exception as e:
         return https_fn.Response(json.dumps({"error": str(e)}), status=500, headers=cors_headers)
+
+@https_fn.on_request()
+def end_session(req: https_fn.Request) -> https_fn.Response:
+    cors_headers, is_options = handle_cors(req)
+    if is_options:
+        return cors_headers
+
+    db = firestore.client()
+    try:
+        from datetime import datetime, timezone
+        data = req.get_json(silent=True) or {}
+        session_id = data.get("sessionId")
+        session_ref, session = get_valid_session(db, session_id)
+
+        if not session:
+            return https_fn.Response(
+                json.dumps({"error": "Sessao nao encontrada."}),
+                status=404, mimetype="application/json", headers=cors_headers
+            )
+
+        session_ref.update({
+            "status": data.get("status", "ongoing"),
+            "duration": data.get("duration", ""),
+            "end_time": datetime.now(timezone.utc),
+        })
+
+        return https_fn.Response(
+            json.dumps({"ok": True}),
+            mimetype="application/json", headers=cors_headers
+        )
+    except Exception as e:
+        return https_fn.Response(
+            json.dumps({"error": str(e)}), status=500, headers=cors_headers
+        )

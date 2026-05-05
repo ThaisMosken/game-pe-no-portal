@@ -63,6 +63,10 @@ input{background:#252525;border:1px solid #444;color:#fff;padding:10px;border-ra
   </div>
 
   <div class="card" style="margin-bottom:12px">
+    <p style="font-size:12px;color:#888;margin-bottom:8px">🕵️ Nome do investigador</p>
+    <input type="text" id="player-name" placeholder="Seu nome de investigador"
+      style="margin-bottom:10px"
+      onkeydown="if(event.key==='Enter') startGame()">
     <p style="font-size:12px;color:#888;margin-bottom:8px">🔑 Senha de acesso</p>
     <input type="password" id="access-password" placeholder="Digite a senha para jogar"
       style="margin-bottom:10px"
@@ -164,10 +168,11 @@ document.addEventListener('click', function(e) {
 });
 
 const URLS = {
-  start:       'https://start-game-hmod4ptaqq-uc.a.run.app',
+  arrest:      'https://arrest-hmod4ptaqq-uc.a.run.app',
+  end_session: 'https://end-session-hmod4ptaqq-uc.a.run.app',
   investigate: 'https://investigate-hmod4ptaqq-uc.a.run.app',
-  travel:      'https://travel-hmod4ptaqq-uc.a.run.app',
-  arrest:      'https://arrest-hmod4ptaqq-uc.a.run.app'
+  start:       'https://start-game-hmod4ptaqq-uc.a.run.app',
+  travel:      'https://travel-hmod4ptaqq-uc.a.run.app'
 };
 
 const HOURS_COST_INVESTIGATING = 2;
@@ -335,6 +340,7 @@ const DOSSIER = [
 
 let G = {
   sessionId: null,
+  playerName: '',
   currentCityId: '',
   currentDay: 1,
   maxDays: 7,
@@ -357,6 +363,7 @@ async function startGame() {
 
   try {
     const password = document.getElementById('access-password').value.trim();
+    const playerName = document.getElementById('player-name').value.trim();
     if (!password) {
       document.getElementById('password-error').textContent = 'Digite a senha para continuar.';
       document.getElementById('password-error').style.display = 'block';
@@ -366,7 +373,7 @@ async function startGame() {
     const res = await fetch(URLS.start, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({password})
+      body: JSON.stringify({password, playerName})
     });
     if (!res.ok) {
       const err = await res.json();
@@ -382,6 +389,7 @@ async function startGame() {
     const data = await res.json();
 
     G.sessionId      = data.sessionId;
+    G.playerName     = playerName;
     G.currentCityId  = data.firstCityId;
     G.venuesInCity   = data.venues;
     G.travelOptions  = data.travelOptions || [];
@@ -666,6 +674,25 @@ async function foundCriminal() {
 }
 
 function endGame(r) {
+  const statusMap = {
+    'won': 'won',
+    'timeout': 'lost_timeout',
+    'wrong_warrant': 'lost_warrant'
+  };
+  const gameStatus = statusMap[r] || 'ongoing';
+  const endHour = Math.floor(G.currentMinutes / 60);
+  const duration = `Dia ${G.currentDay} - ${endHour}:00`;
+
+  fetch(URLS.end_session, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      sessionId: G.sessionId,
+      status: gameStatus,
+      duration: duration
+    })
+  }).catch(() => {});
+
   document.getElementById('game-screen').classList.remove('active');
   document.getElementById('result-screen').classList.add('active');
 
