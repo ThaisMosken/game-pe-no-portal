@@ -105,6 +105,8 @@ def start_game(req: https_fn.Request) -> https_fn.Response:
         config_ref = db.collection("config").document("access")
         config_doc = config_ref.get()
         config = config_doc.to_dict() if config_doc.exists else {}
+        clue_probability = config.get("clue_probability", 0.6)
+        trail_length = int(config.get("trail_length", 6))
 
         # Valida senha
         expected_password = config.get("password", "")
@@ -131,7 +133,7 @@ def start_game(req: https_fn.Request) -> https_fn.Response:
 
         all_city_ids = [d.to_dict()["id"] for d in db.collection("cities").select(["id"]).stream()]
         criminal_id = random.choice(CRIMINAL_IDS)
-        trail_ids = random.sample(all_city_ids, 6)
+        trail_ids = random.sample(all_city_ids, trail_length)
         non_trail_ids = [c for c in all_city_ids if c not in trail_ids]
 
         venues_per_city = {}
@@ -151,6 +153,7 @@ def start_game(req: https_fn.Request) -> https_fn.Response:
             "distractors_per_city": distractors_per_city,
             "used_curiosities_per_city": {},
             "player": player_name,
+            "clue_probability": clue_probability,
         })
 
         return https_fn.Response(
@@ -213,6 +216,7 @@ def investigate(req: https_fn.Request) -> https_fn.Response:
             )
 
         criminal = CRIMINALS_DATA[criminal_id]
+        clue_probability = session.get("clue_probability", 0.6)
 
         if current_step == len(trail) - 1:
             used_in_final = session.get("used_curiosities_per_city", {}).get(trail[current_step], [])
@@ -255,7 +259,7 @@ def investigate(req: https_fn.Request) -> https_fn.Response:
             f"used_curiosities_per_city.{current_location}": used_curiosities + [lead]
         })
 
-        add_clue = random.random() < 0.6
+        add_clue = random.random() < clue_probability
         gender_prefix = "A mulher" if criminal.get("gender") == "F" else "O homem"
         traits = [
             f"{gender_prefix} que você procura esteve aqui e",
