@@ -370,6 +370,10 @@ def travel(req: https_fn.Request) -> https_fn.Response:
                 and current_step + 1 < len(trail)
                 and target_city_id == trail[current_step + 1]):
             current_step += 1
+        elif target_city_id in trail:
+            trail_index = trail.index(target_city_id)
+            if trail_index < current_step:
+                current_step = trail_index
 
         player_on_trail = (target_city_id == trail[current_step])
 
