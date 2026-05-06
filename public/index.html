@@ -89,6 +89,11 @@ input{background:#252525;border:1px solid #444;color:#fff;padding:10px;border-ra
       <div style="background:#333;border-radius:6px;height:8px;width:100px;overflow:hidden"><div id="time-fill" style="height:100%;background:#16a34a"></div></div>
     </div>
   </div>
+  <div id="trail-meter" style="display:flex;align-items:center;gap:6px;padding:10px 14px;background:#1e1e1e;border:1px solid #333;border-radius:10px">
+    <span style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap">Rastro</span>
+    <div id="trail-dots" style="display:flex;gap:5px;flex:1;justify-content:center"></div>
+    <span id="trail-label" style="font-size:11px;color:#888;white-space:nowrap"></span>
+  </div>
 
   <div class="card" style="text-align:center">
     <div id="warrant-display" style="font-weight:600;color:#eab308;font-size:16px;margin-bottom:8px">Nenhum Mandado</div>
@@ -351,6 +356,8 @@ let G = {
   clues: [],
   history: [],
   travelOptions: [],
+  currentStep: 0,
+  trailLength: 6,
   isRequesting: false
 };
 
@@ -393,6 +400,8 @@ async function startGame() {
     G.currentCityId  = data.firstCityId;
     G.venuesInCity   = data.venues;
     G.travelOptions  = data.travelOptions || [];
+    G.currentStep    = data.currentStep ?? 0;
+    G.trailLength    = data.trailLength ?? 6;
     G.history        = [data.firstCityId];
 
     document.getElementById('setup-screen').classList.remove('active');
@@ -490,6 +499,8 @@ async function travelTo(targetCityId) {
     G.currentCityId = data.cityId;
     G.venuesInCity  = data.venues;
     G.travelOptions = data.travelOptions || [];
+    G.currentStep   = data.currentStep ?? G.currentStep;
+    G.trailLength   = data.trailLength ?? G.trailLength;
 
     G.clues.push(`<strong>[Teleporte]</strong> De ${fromCity} para ${toCity} (Dia ${G.currentDay})`);
 
@@ -513,6 +524,7 @@ function renderGameScreen() {
 
   renderVenues();
   renderTravel();
+  renderTrailMeter();
 }
 
 function renderVenues() {
@@ -726,6 +738,34 @@ function endGame(r) {
         <p style="font-size:12px;font-style:italic;line-height:1.4">${routeNames}</p>
       </div>
     </div>`;
+}
+
+function renderTrailMeter() {
+  const total = G.trailLength;
+  const step  = G.currentStep;
+
+  const labels = [
+    'Rastro frio',
+    'Rastro frio',
+    'Rastro morno',
+    'Rastro morno',
+    'Rastro quente',
+    'Muito próximo!'
+  ];
+  const colors = ['#3b82f6','#3b82f6','#f59e0b','#f59e0b','#ef4444','#ef4444'];
+
+  const dotsEl = document.getElementById('trail-dots');
+  const labelEl = document.getElementById('trail-label');
+  let html = '';
+  for (let i = 0; i < total; i++) {
+    const filled = i <= step;
+    const color  = filled ? colors[Math.min(step, colors.length - 1)] : '#2a2a2a';
+    const border = filled ? color : '#444';
+    html += `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid ${border};transition:background 0.4s"></div>`;
+  }
+  dotsEl.innerHTML = html;
+  labelEl.textContent = labels[Math.min(step, labels.length - 1)];
+  labelEl.style.color = colors[Math.min(step, colors.length - 1)];
 }
 </script>
 </body>

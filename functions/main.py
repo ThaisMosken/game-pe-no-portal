@@ -165,6 +165,8 @@ def start_game(req: https_fn.Request) -> https_fn.Response:
                     history=[trail_ids[0]],
                     distractors=distractors_per_city[trail_ids[0]],
                 ),
+                "currentStep": 0,
+                "trailLength": 6,
             }),
             mimetype="application/json",
             headers=cors_headers
@@ -400,6 +402,8 @@ def travel(req: https_fn.Request) -> https_fn.Response:
                 "cityId": target_city_id,
                 "venues": venues_per_city[target_city_id],
                 "travelOptions": travel_options,
+                "currentStep": current_step,
+                "trailLength": len(trail),
             }),
             mimetype="application/json", headers=cors_headers
         )
