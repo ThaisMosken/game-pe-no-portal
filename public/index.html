@@ -246,6 +246,7 @@ const DOSSIER = [
     name: "Aranha Negra",
     portrait: "🕷️",
     species: "Elfo",
+    hair: "Cabelos brancos",
     hobby: "Xadrez",
     transport: "Costuma se locomover por meios mágicos",
     trait: "Carrega consigo um cajado cuja ponta tem a forma de uma aranha negra",
@@ -256,6 +257,7 @@ const DOSSIER = [
     name: "Cajado de Vidro",
     portrait: "🪄",
     species: "Humano",
+    hair: "Cabelos pretos",
     hobby: "Xadrez",
     transport: "Costuma se locomover por meios mágicos",
     trait: "Nunca aparece em público sem seu cajado de vidro",
@@ -266,6 +268,7 @@ const DOSSIER = [
     name: "Halia Thornton",
     portrait: "💍",
     species: "Humana",
+    hair: "Cabelos castanhos",
     hobby: "Cartas",
     transport: "Carruagem de ébano e cortinas escuras",
     trait: "É fã de anéis e colares com pedras preciosas",
@@ -276,6 +279,7 @@ const DOSSIER = [
     name: "Jarlaxle Baenre",
     portrait: "🎩",
     species: "Elfo",
+    hair: "Careca",
     hobby: "Cartas",
     transport: "Máquina infernal com duas rodas particularmente rápida",
     trait: "Possui um anel de diamante do tamanho de uma toranja",
@@ -286,6 +290,7 @@ const DOSSIER = [
     name: "Lorde Drylund",
     portrait: "🐙",
     species: "Humano",
+    hair: "Cabelos grisalhos",
     hobby: "Dados",
     transport: "Carruagem excessivamente enfeitada",
     trait: "Dizem que tem uma tatuagem de polvo nas costas",
@@ -296,6 +301,7 @@ const DOSSIER = [
     name: "Nass Lantomir",
     portrait: "🔥",
     species: "Humana",
+    hair: "Cabelos ruivos",
     hobby: "Cartas",
     transport: "Costuma se locomover por meios mágicos",
     trait: "Anda com seu cajado que serve como foco arcano",
@@ -306,6 +312,7 @@ const DOSSIER = [
     name: "Nove-Dedos Keene",
     portrait: "👑",
     species: "Humana",
+    hair: "Cabelos castanhos",
     hobby: "Dados",
     transport: "Carruagem guiada por capangas",
     trait: "É sempre vista com colares de ouro e armas adornadas em joias",
@@ -316,6 +323,7 @@ const DOSSIER = [
     name: "Prisioneira 13",
     portrait: "⛓️",
     species: "Anã",
+    hair: "Cabelos ruivos",
     hobby: "Dados",
     transport: "Máquina infernal com duas rodas, bastante barulhenta",
     trait: "Possui tatuagens por todo o corpo, muitas das quais são mágicas",
@@ -326,6 +334,7 @@ const DOSSIER = [
     name: "Valindra Shadowmantle",
     portrait: "💀",
     species: "Elfa",
+    hair: "Cabelos loiros",
     hobby: "Xadrez",
     transport: "Costuma se locomover por meios mágicos",
     trait: "Utiliza joias élficas delicadas ao aparecer em público",
@@ -336,6 +345,7 @@ const DOSSIER = [
     name: "Xardorok Sunblight",
     portrait: "⚒️",
     species: "Anão",
+    hair: "Cabelos grisalhos",
     hobby: "Dados",
     transport: "Carruagem de aço puxada por constructos",
     trait: "Dizem que possui tatuagens de runas anãs em seu braço esquerdo",
@@ -641,7 +651,8 @@ function showDossierDetail(id) {
     + '<div class="dossier-subtitle">' + d.species + '</div></div>'
     + '</div>'
     + '<div>'
-    + dossierField('🎲', 'Passatempo favorito', d.hobby)
+    + dossierField('💇', 'Cabelo', d.hair)
+      + dossierField('🎲', 'Passatempo favorito', d.hobby)
     + dossierField('⛵', 'Meio de transporte', d.transport)
     + dossierField('✨', 'Traço marcante', d.trait)
     + dossierField('🍽️', 'Preferências culinárias', d.cuisine)
