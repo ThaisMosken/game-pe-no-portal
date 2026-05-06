@@ -481,8 +481,11 @@ async function travelTo(targetCityId) {
 
   try {
     let updatedHistory = [...G.history];
-    if (updatedHistory.length > 1 && targetCityId === updatedHistory[updatedHistory.length - 2]) {
+    const backIndex = updatedHistory.lastIndexOf(targetCityId);
+    if (backIndex !== -1 && backIndex === updatedHistory.length - 2) {
       updatedHistory.pop();
+    } else if (backIndex !== -1 && backIndex < updatedHistory.length - 2) {
+      updatedHistory = updatedHistory.slice(0, backIndex + 1);
     } else {
       updatedHistory.push(targetCityId);
     }
