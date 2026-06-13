@@ -603,6 +603,15 @@ function advanceTime(minutes) {
   }
 
   if (G.currentDay > G.maxDays) {
+    try {
+      const res = await fetch(URLS.arrest, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({sessionId: G.sessionId, warrantId: null})
+      });
+      const data = await res.json();
+      G.realCriminalId = data.criminalId || null;
+    } catch (e) {}
     endGame('timeout');
     return false;
   }
