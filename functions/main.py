@@ -447,7 +447,7 @@ def arrest(req: https_fn.Request) -> https_fn.Response:
         status = "won" if warrant_id == session["criminal_id"] else "wrong_warrant"
 
         return https_fn.Response(
-            json.dumps({"status": status}),
+            json.dumps({"status": status, "criminalId": session["criminal_id"]}),
             mimetype="application/json", headers=cors_headers
         )
 

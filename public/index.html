@@ -376,6 +376,7 @@ let G = {
   travelOptions: [],
   currentStep: 0,
   trailLength: 6,
+  realCriminalId: null,
   isRequesting: false
 };
 
@@ -556,6 +557,13 @@ function renderVenues() {
     container.innerHTML = '<div class="card" style="color:#888;font-size:13px;text-align:center;padding:24px">⚠️ Você está no caminho errado.<br>Não há testemunhas para interrogar aqui.</div>';
     return;
   }
+
+  if (G.currentStep === G.trailLength - 1) {
+    html += '<div class="card" style="border:2px solid #ef4444;background:#2a0a0a;color:#fca5a5;font-size:13px;line-height:1.5;margin-bottom:12px">'
+      + '<p style="color:#ef4444;font-weight:bold;text-transform:uppercase;font-size:11px;letter-spacing:1px;margin-bottom:8px">🚨 ALERTA VERMELHO</p>'
+      + '<p>O criminoso acabou de ser visto na cidade e está escondido em um dos estabelecimentos locais. As testemunhas estão com medo de falar mais do que isso. Mas atenção: se você entrar no estabelecimento em que o criminoso está escondido sem ter o mandado de busca para a pessoa correta, ele vai escapar. Use esse momento para revisar suas evidências e garantir que o mandado esteja emitido para quem você acredita ser o criminoso antes de investigar os estabelecimentos.</p>'
+      + '</div>';
+  }
   for (var i = 0; i < G.venuesInCity.length; i++) {
     var vid     = G.venuesInCity[i];
     var v       = VENUES_CATALOG[vid] || {name: vid, icon: '?'};
@@ -705,6 +713,7 @@ async function foundCriminal() {
       body: JSON.stringify({sessionId: G.sessionId, warrantId: G.warrant})
     });
     const data = await res.json();
+    G.realCriminalId = data.criminalId || null;
     endGame(data.status);
   } catch (e) {
     endGame('wrong_warrant');
@@ -739,12 +748,20 @@ function endGame(r) {
 
   let criminalStatus;
   if (r === 'won') {
-    criminalStatus = `O suspeito permanecerá atrás das grades por um bom tempo.<br>Bom trabalho!`;
+    const criminalEntry = CRIMINALS_CATALOG.find(c => c.id === G.realCriminalId);
+    const criminalName = criminalEntry ? criminalEntry.name : G.realCriminalId;
+    criminalStatus = `Criminoso encontrado: <strong>${criminalName}</strong><br>O criminoso permanecerá atrás das grades por um bom tempo.<br>Bom trabalho!`;
   } else {
     const reason = r === 'timeout'
       ? 'O tempo acabou e os rastros esfriaram.'
       : 'O mandado estava incorreto.';
-    criminalStatus = `O suspeito escapou por entre seus dedos...<br>${reason}`;
+    const warrantEntry = G.warrant ? CRIMINALS_CATALOG.find(c => c.id === G.warrant) : null;
+    const warrantName = warrantEntry ? warrantEntry.name : 'Nenhum';
+    const criminalEntry = CRIMINALS_CATALOG.find(c => c.id === G.realCriminalId);
+    const criminalName = criminalEntry ? criminalEntry.name : (G.realCriminalId || 'Desconhecido');
+    criminalStatus = `O suspeito escapou por entre seus dedos...<br>${reason}<br><br>`
+      + `<span style="font-size:13px;color:#aaa">Mandado emitido: <strong style="color:#fff">${warrantName}</strong><br>`
+      + `Criminoso: <strong style="color:#fbbf24">${criminalName}</strong></span>`;
   }
 
   const routeNames = G.history
