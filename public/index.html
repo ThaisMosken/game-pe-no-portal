@@ -722,19 +722,15 @@ function issueWarrant(id) {
 
 async function foundCriminal() {
   G.isRequesting = false;
-  if (!G.warrant) {
-    endGame('wrong_warrant');
-    return;
-  }
   try {
     const res = await fetch(URLS.arrest, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({sessionId: G.sessionId, warrantId: G.warrant})
+      body: JSON.stringify({sessionId: G.sessionId, warrantId: G.warrant || null})
     });
     const data = await res.json();
     G.realCriminalId = data.criminalId || null;
-    endGame(data.status);
+    endGame(G.warrant ? data.status : 'wrong_warrant');
   } catch (e) {
     endGame('wrong_warrant');
   }
