@@ -559,11 +559,18 @@ function renderVenues() {
   }
 
   if (G.currentStep === G.trailLength - 1) {
-    html += '<div class="card" style="border:2px solid #ef4444;background:#2a0a0a;color:#fca5a5;font-size:13px;line-height:1.5;margin-bottom:12px">'
-      + '<p style="color:#ef4444;font-weight:bold;text-transform:uppercase;font-size:11px;letter-spacing:1px;margin-bottom:8px">🚨 ALERTA VERMELHO</p>'
-      + '<p>O criminoso acabou de ser visto na cidade e está escondido em um dos estabelecimentos locais. As testemunhas estão com medo de falar mais do que isso. Mas atenção: se você entrar no estabelecimento em que o criminoso está escondido sem ter o mandado de busca para a pessoa correta, ele vai escapar. Use esse momento para revisar suas evidências e garantir que o mandado esteja emitido para quem você acredita ser o criminoso antes de investigar os estabelecimentos.</p>'
-      + '</div>';
+    html += `
+      <div class="card" style="border:2px solid #ef4444;background:#2a0a0a;color:#fca5a5;font-size:13px;line-height:1.5;margin-bottom:12px">
+        <p style="color:#ef4444;font-weight:bold;text-transform:uppercase;font-size:11px;letter-spacing:1px;margin-bottom:8px">🚨 ALERTA VERMELHO</p>
+        <p style="margin-bottom:8px">O criminoso está nesta cidade, escondido em um dos estabelecimentos.</p>
+        <ul style="list-style:disc;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+          <li>As testemunhas estão intimidadas e não darão novas pistas.</li>
+          <li>Investigue os estabelecimentos locais para tentar encontrá-lo.</li>
+          <li>Revise suas evidências e o mandado de prisão. Se você entrar no esconderijo sem um mandado correto, o criminoso escapará.</li>
+        </ul>
+      </div>`;
   }
+
   for (var i = 0; i < G.venuesInCity.length; i++) {
     var vid     = G.venuesInCity[i];
     var v       = VENUES_CATALOG[vid] || {name: vid, icon: '?'};
