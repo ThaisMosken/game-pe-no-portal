@@ -343,20 +343,20 @@
     "id": "newfort",
     "name": "Newfort",
     "curiosities": {
-      "Culture": "a vida rústica e pragmática de pioneiros que enfrentam os perigos da natureza",
+      "Culture": "a vida pacata de uma pequena aldeia que serve como ponto de descanso para viajantes",
       "Defense": "uma paliçada de troncos de madeira e batedores que vigiam os arredores",
-      "Factions": "agentes da Ordem da Manopla que buscam estabelecer a lei em terras indomadas",
-      "Geographical Aspects": "uma clareira isolada cercada por florestas densas e selvagens",
-      "Geography": "o isolamento geográfico de uma vila situada longe das principais rotas comerciais",
-      "Government Type": "um conselho informal de anciãos que toma as decisões para a comunidade",
-      "History": "a fundação recente por famílias que fugiam da superlotação das grandes cidades",
-      "Infrastructure": "construções simples de toras de madeira e um armazém fortificado para suprimentos",
-      "Magic": "o uso ocasional de pergaminhos de proteção contra feras selvagens",
-      "Politics": "a disputa interna pela distribuição de terras férteis recém-descobertas",
-      "Races": "colonos humanos, meio-orcs e alguns anões em busca de novas terras",
-      "Religion": "santuários simples dedicados a Silvanus e Chauntea para abençoar a terra",
-      "Settlement Type": "um pequeno assentamento de fronteira e posto avançado",
-      "Trade": "madeira bruta, peles de animais e minerais extraídos localmente"
+      "Factions": "a fundação por veteranos Zhentarim aposentados",
+      "Geographical Aspects": "uma aldeia nos contrafortes das Montanhas Rauvin, sobre uma colina com visão do vale de Sundabar",
+      "Geography": "a proximidade com o sopé das Montanhas Rauvin",
+      "Government Type": "um xerife local que lidera duas dezenas de guardas",
+      "History": "a fundação por veteranos Zhentarim aposentados em busca de um recomeço longe de Zhentil Keep",
+      "Infrastructure": "construções simples de toras de madeira ao redor de um pequeno riacho",
+      "Magic": "a escassez de itens mágicos dado o tamanho diminuto da aldeia",
+      "Politics": "a tensão entre a origem dos fundadores da aldeia e a desconfiança das cidades vizinhas",
+      "Races": "colonos humanos, meio-orcs e meio-elfos",
+      "Religion": "santuário dedicado a Tempus",
+      "Settlement Type": "uma pequena aldeia",
+      "Trade": "madeira, peles e farinha"
     }
   },
   {
